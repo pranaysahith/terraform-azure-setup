@@ -172,7 +172,7 @@
         }
 
       
-10. To generate a private public key pair, tls provider can be used in terraform.
+11. To generate a private public key pair, tls provider can be used in terraform.
     A 2048 bit RSA based key pair is generated.
 
         provider "tls" {}
@@ -182,7 +182,7 @@
         }
 
 
-11. Create an Ubuntu VM.
+12. Create an Ubuntu VM.
         
         resource "azurerm_virtual_machine" "ubuntuvm" {
           location = var.location
