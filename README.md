@@ -6,7 +6,7 @@
 
 ## Detailed instructions:
 
-2. Terraform needs a Service Principal (client_id and client_secret) which is authorized to create resources in Azure subscription
+1. Terraform needs a Service Principal (client_id and client_secret) which is authorized to create resources in Azure subscription
     
     a. Login to https://portal.azure.com/
     
@@ -20,7 +20,7 @@
     
     e. Make a note of tenant id from overview blade.
 
-3. Give access to create resources for the service principal.
+2. Give access to create resources for the service principal.
 
     a. By default a newly created service principal does not have any access. 
     
@@ -30,14 +30,43 @@
     Select `contributor` from dropdown of Role and search by the name of service principal that is created earlier and select the correct service principal.
     Click on Save button.
     
-0. explain azure shell
+3. explain azure shell
     
     a. Go to https://shell.azure.com/
     
     b. Choose `bash` from the left top dropdown.
     
-    c.  
+    c. Use an editor vi or nano to create an empty file - main.tf  
+    
+    d. 
 
-3. Explain terraform installation and execution
-1. Explain Terraform main.tf
-4. explain ssh keys
+4. Install Terraform in Azure Shell
+
+    a. Go to terraform downloads page (https://www.terraform.io/downloads.html) and copy 64 bit Linux URL
+    
+    b. use wget to download the file in azure shell:
+        
+        `wget https://releases.hashicorp.com/terraform/0.12.18/terraform_0.12.18_linux_amd64.zip`
+    
+    c. unzip the download zip file:
+        
+        `unzip terraform_0.12.18_linux_amd64.zip`
+        
+    d. copy the extracted terraform file to /usr/local/bundle/bin location so that terraform command can be executed from anywhere.
+    
+        `cp terraform /usr/local/bundle/bin`
+        
+5. Explain Terraform main.tf
+    
+    1. A provider is responsible for understanding API interactions and exposing resources:
+        `provider "azurerm" {
+          version = "1.39"
+          client_id = "${var.client_id}"
+          client_secret = "${var.client_secret}"
+          subscription_id = "${var.subscription_id}"
+          tenant_id = "${var.tenant_id}"
+          environment = "public"
+        }`
+
+
+6. explain ssh keys
