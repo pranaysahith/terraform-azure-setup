@@ -101,7 +101,6 @@
  
 8. A subnet is a range of IP addresses in the VNet. You can divide a VNet into multiple subnets for organization and security.
    Each NIC in a VM is connected to one subnet in one VNet. NICs connected to subnets (same or different) within a VNet can communicate with each other without any extra configuration.
-   The size of subnet i.e. number of IP addresses available in the subnet depends on subnet address prefix.
    The name of the virtual network in which the subnet has to be created should be mentioned using interpolation.
 
         resource "azurerm_subnet" "subnet" {
@@ -123,9 +122,7 @@
         }
     
     Create security rules and assign to security group. Here to allows ssh, source and destination port 22 must be allowed.
-    Source and destination address prefix can be set to "0.0.0.0" to allow from all address i.e. public internet. 
-    The security rules will be evaluated as per the priority of the rules. 
-        
+         
         resource "azurerm_network_security_rule" "srule" {
           access = "allow"
           direction = "Inbound"
@@ -149,8 +146,7 @@
 
 10. Network interface with public IP. A network interface enables an Azure Virtual Machine to communicate with internet, Azure, and on-premises resources
     A public IP address is needed to communicate with the Ubuntu VM. Create a public IP and assign the id to ip configuration of NIC.
-    If the public IP address allocation method is dynamic, a new IP address will be generated after every reboot of the VM.
-    If allocation method is static, the IP address will be persisted over VM reboots.
+    
 
         resource "azurerm_network_interface" "nic" {
           location = "${var.location}"
@@ -181,8 +177,15 @@
           rsa_bits = 2048
         }
 
+    The private key can be saved to local file to use it while connecting to VM.
 
-12. Create an Ubuntu VM.
+        resource "local_file" "private_key" {
+          filename = "private_key.pem"
+          content = "${tls_private_key.key.private_key_pem}"
+        }
+
+
+12. Create an Ubuntu VM with private key authentication.
         
         resource "azurerm_virtual_machine" "ubuntuvm" {
           location = var.location
