@@ -49,9 +49,9 @@
     
         cp terraform /usr/local/bundle/bin
         
-5. Explain Terraform 
+5. Terraform 
     
-    1. A provider is responsible for understanding API interactions and exposing resources. 
+    a. A provider is responsible for understanding API interactions and exposing resources. 
     azurerm provides interface to Azure Resource Manager to create azure resources.
     client_id and client_secret should be set with values obtained in step 1d. 
     tenant_id and subscription_id are obtained from steps 1e and 2b respectively:
@@ -65,14 +65,14 @@
               environment = "public"
             }
 
-    2. Input variables serve as parameters and are generally defined in variables.tf file
+    b. Input variables serve as parameters and are generally defined in variables.tf file
     
             variable "client_id" {}
             variable "client_secret" {}
             variable "subscription_id" {}
             variable "tenant_id" {}
             
-    3. Create a resource group. Resource group is a collection of resources. 
+    c. Create a resource group. Resource group is a collection of resources. 
     Interpolation syntax can be used to create names for resource groups based on 1 or more variables. 
     Its a good practice to keep separate resource group for each environment such as dev, test, perf, prod etc. 
     
@@ -83,9 +83,9 @@
 
 6. Apply terraform configuration
 
-    1. Run `terraform validate` command to validate the syntax in all tf in current directory. Syntax errors are highlighted in the output. 
-    2. Run `terraform plan`  command to generate a plan of action. This shows the resources to be added, changed and destroyed.
-    3. Once the plan is generated and looks good, run `terraform apply` and pass the variable values when asked.
+    a. Run `terraform validate` command to validate the syntax in all tf in current directory. Syntax errors are highlighted in the output. 
+    b. Run `terraform plan`  command to generate a plan of action. This shows the resources to be added, changed and destroyed.
+    c. Once the plan is generated and looks good, run `terraform apply` and pass the variable values when asked.
     
 7. Azure Virtual Network (VNet) is the fundamental building block for a private network in Azure.
    VNet enables many types of Azure resources, such as Azure Virtual Machines (VM),
