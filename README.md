@@ -59,14 +59,15 @@
 5. Explain Terraform main.tf
     
     1. A provider is responsible for understanding API interactions and exposing resources:
-        `provider "azurerm" {
-          version = "1.39"
-          client_id = "${var.client_id}"
-          client_secret = "${var.client_secret}"
-          subscription_id = "${var.subscription_id}"
-          tenant_id = "${var.tenant_id}"
-          environment = "public"
-        }`
+        
+            provider "azurerm" {
+            version = "1.39"
+              client_id = "${var.client_id}"
+              client_secret = "${var.client_secret}"
+              subscription_id = "${var.subscription_id}"
+              tenant_id = "${var.tenant_id}"
+              environment = "public"
+            }
 
 
 6. explain ssh keys
