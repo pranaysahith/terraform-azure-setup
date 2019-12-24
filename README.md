@@ -30,9 +30,8 @@
     
     b. Choose `bash` from the left top dropdown.
     
-    c. Use an editor vi or nano to create an empty file - main.tf  
+    c. Use an editor vi or nano to create an empty file - provider.tf  
     
-    d. 
 
 4. Install Terraform in Azure Shell
 
