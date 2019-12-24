@@ -46,15 +46,15 @@
     
     b. use wget to download the file in azure shell:
         
-        `wget https://releases.hashicorp.com/terraform/0.12.18/terraform_0.12.18_linux_amd64.zip`
+        wget https://releases.hashicorp.com/terraform/0.12.18/terraform_0.12.18_linux_amd64.zip
     
     c. unzip the download zip file:
         
-        `unzip terraform_0.12.18_linux_amd64.zip`
+        unzip terraform_0.12.18_linux_amd64.zip
         
     d. copy the extracted terraform file to /usr/local/bundle/bin location so that terraform command can be executed from anywhere.
     
-        `cp terraform /usr/local/bundle/bin`
+        cp terraform /usr/local/bundle/bin
         
 5. Explain Terraform main.tf
     
