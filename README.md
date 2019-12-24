@@ -90,8 +90,61 @@
 
 6. Apply terraform configuration
 
-    1. Run `terraform validate` command to validate the syntax in all tf in current directory. Sytax errors are highlighted in the output. 
+    1. Run `terraform validate` command to validate the syntax in all tf in current directory. Syntax errors are highlighted in the output. 
     2. Run `terraform plan`  command to generate a plan of action. This shows the resources to be added, changed and destroyed.
     3. Once the plan is generated and looks good, run `terraform apply` and pass the variable values when asked.
     
-7. explain ssh keys
+7. Azure Virtual Network (VNet) is the fundamental building block for a private network in Azure.
+   VNet enables many types of Azure resources, such as Azure Virtual Machines (VM),
+   to securely communicate with each other as well as internet.
+   
+        resource "azurerm_virtual_network" "vnet" {
+          address_space = ["10.0.0.0/16"]
+          location = var.location
+          name = "${var.org_name}-${var.env}-vnet"
+          resource_group_name = azurerm_resource_group.rg.name
+        }
+ 
+8. Subnet is ..
+
+        resource "azurerm_subnet" "subnet" {
+          address_prefix = "10.0.0.0/24"
+          name = "${var.org_name}-${var.env}-snet"
+          resource_group_name = "${azurerm_resource_group.rg.name}"
+          virtual_network_name = "${azurerm_virtual_network.vnet.name}"
+        } 
+
+9. security group ..
+
+    Create security group:
+    
+        resource "azurerm_network_security_group" "sg" {
+          location = "${var.location}"
+          name = "${var.org_name}-${var.env}-sg"
+          resource_group_name = "${azurerm_resource_group.rg.name}"
+        }
+    
+    Create security rules and assign to security group
+        
+        resource "azurerm_network_security_rule" "srule" {
+          access = "allow"
+          direction = "Inbound"
+          name = "ssh"
+          network_security_group_name = "${azurerm_network_security_group.sg.name}"
+          priority = 100
+          protocol = "tcp"
+          source_port_range = "22"
+          destination_port_range = "22"
+          source_address_prefixes = ["0.0.0.0"]
+          destination_address_prefixes = ["0.0.0.0"]
+          resource_group_name = "${azurerm_resource_group.rg.name}"
+        }
+        
+     Associate the security group to the subnet
+        
+        resource "azurerm_subnet_network_security_group_association" "subnet_sg" {
+          network_security_group_id = "${azurerm_network_security_group.sg.id}"
+          subnet_id = "${azurerm_subnet.subnet.id}"
+        }
+
+8. explain ssh keys
