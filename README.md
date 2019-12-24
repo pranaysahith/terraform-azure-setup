@@ -105,26 +105,32 @@
           resource_group_name = azurerm_resource_group.rg.name
         }
  
-8. Subnet is ..
+8. A subnet is a range of IP addresses in the VNet. You can divide a VNet into multiple subnets for organization and security.
+   Each NIC in a VM is connected to one subnet in one VNet. NICs connected to subnets (same or different) within a VNet can communicate with each other without any extra configuration.
+   The size of subnet i.e. number of IP addresses available in the subnet depends on subnet address prefix.
+   The name of the virtual network in which the subnet has to be created should be mentioned using interpolation.
 
         resource "azurerm_subnet" "subnet" {
           address_prefix = "10.0.0.0/24"
           name = "${var.org_name}-${var.env}-snet"
-          resource_group_name = "${azurerm_resource_group.rg.name}"
-          virtual_network_name = "${azurerm_virtual_network.vnet.name}"
+          resource_group_name = azurerm_resource_group.rg.name
+          virtual_network_name = azurerm_virtual_network.vnet.name
         } 
 
-9. security group ..
+9. security group contains a list of security rules that allow or deny network traffic to resources connected to Azure Virtual Networks.
+   security groups can be associated to subnets, classic VMs or network interfaces.
 
     Create security group:
     
         resource "azurerm_network_security_group" "sg" {
-          location = "${var.location}"
+          location = var.location
           name = "${var.org_name}-${var.env}-sg"
-          resource_group_name = "${azurerm_resource_group.rg.name}"
+          resource_group_name = azurerm_resource_group.rg.name
         }
     
-    Create security rules and assign to security group
+    Create security rules and assign to security group. Here to allows ssh, source and destination port 22 must be allowed.
+    Source and destination address prefix can be set to "0.0.0.0" to allow from all address i.e. public internet. 
+    The security rules will be evaluated as per the priority of the rules. 
         
         resource "azurerm_network_security_rule" "srule" {
           access = "allow"
@@ -140,11 +146,80 @@
           resource_group_name = "${azurerm_resource_group.rg.name}"
         }
         
-     Associate the security group to the subnet
+    Associate the security group to the subnet
         
         resource "azurerm_subnet_network_security_group_association" "subnet_sg" {
           network_security_group_id = "${azurerm_network_security_group.sg.id}"
           subnet_id = "${azurerm_subnet.subnet.id}"
         }
 
-8. explain ssh keys
+10. Network interface with public IP. A network interface enables an Azure Virtual Machine to communicate with internet, Azure, and on-premises resources
+    A public IP address is needed to communicate with the Ubuntu VM. Create a public IP and assign the id to ip configuration of NIC.
+    If the public IP address allocation method is dynamic, a new IP address will be generated after every reboot of the VM.
+    If allocation method is static, the IP address will be persisted over VM reboots.
+
+        resource "azurerm_network_interface" "nic" {
+          location = "${var.location}"
+          name = "${var.org_name}-${var.env}-nic"
+          resource_group_name = "${azurerm_resource_group.rg.name}"
+          ip_configuration {
+            name = "ubuntu-vm-ip"
+            private_ip_address_allocation = "Dynamic"
+            public_ip_address_id = "${azurerm_public_ip.public_ip.id}"
+            subnet_id = "${azurerm_subnet.subnet.id}"
+          }
+        }
+        
+        resource "azurerm_public_ip" "public_ip" {
+          location = var.location
+          name = "ubuntu-ip"
+          resource_group_name = azurerm_resource_group.rg.name
+          allocation_method = "Dynamic"
+        }
+
+      
+10. To generate a private public key pair, tls provider can be used in terraform.
+    A 2048 bit RSA based key pair is generated.
+
+        provider "tls" {}
+        resource "tls_private_key" "key" {
+          algorithm = "RSA"
+          rsa_bits = 2048
+        }
+
+
+11. Create an Ubuntu VM.
+        
+        resource "azurerm_virtual_machine" "ubuntuvm" {
+          location = "${var.location}"
+          name = "ubuntu-vm"
+          network_interface_ids = ["${azurerm_network_interface.nic.id}"]
+          resource_group_name = "${azurerm_resource_group.rg.name}"
+          vm_size = "${var.vm_size}"
+          storage_os_disk {
+            name              = "vmdist"
+            caching           = "ReadWrite"
+            create_option     = "FromImage"
+            managed_disk_type = "Standard_LRS"
+          }
+          storage_image_reference {
+            publisher = "Canonical"
+            offer     = "UbuntuServer"
+            sku       = "18.04-LTS"
+            version   = "latest"
+          }
+          os_profile {
+            admin_username = "${var.admin_username}"
+            computer_name = "ubuntu"
+          }
+          os_profile_linux_config {
+            disable_password_authentication = true
+            ssh_keys {
+              key_data = "${tls_private_key.key.public_key_openssh}"
+              path = "/home/${var.admin_username}/.ssh/authorized_keys"
+            }
+          }
+        }
+ 
+
+12. 
