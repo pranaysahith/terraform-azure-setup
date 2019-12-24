@@ -24,7 +24,7 @@
 
     a. By default a newly created service principal does not have any access. 
     
-    b. Contributor access has to be provided on the subscription in which resources needs to be created.
+    b. Contributor access has to be provided on the subscription in which resources needs to be created. Also, make a note of subscription id.
     
     c. From `Access control (IAM)` blade, click `Add` and choose `Add role assignment`. 
     Select `contributor` from dropdown of Role and search by the name of service principal that is created earlier and select the correct service principal.
@@ -56,18 +56,42 @@
     
         cp terraform /usr/local/bundle/bin
         
-5. Explain Terraform main.tf
+5. Explain Terraform 
     
-    1. A provider is responsible for understanding API interactions and exposing resources:
+    1. A provider is responsible for understanding API interactions and exposing resources. 
+    azurerm provides interface to Azure Resource Manager to create azure resources.
+    client_id and client_secret should be set with values obtained in step 1d. 
+    tenant_id and subscription_id are obtained from steps 1e and 2b respectively:
         
             provider "azurerm" {
-            version = "1.39"
-              client_id = "${var.client_id}"
-              client_secret = "${var.client_secret}"
-              subscription_id = "${var.subscription_id}"
-              tenant_id = "${var.tenant_id}"
+              version = "1.39"
+              client_id = var.client_id
+              client_secret = var.client_secret
+              subscription_id = var.subscription_id
+              tenant_id = var.tenant_id
               environment = "public"
             }
 
+    2. Input variables serve as parameters and are generally defined in variables.tf file
+    
+            variable "client_id" {}
+            variable "client_secret" {}
+            variable "subscription_id" {}
+            variable "tenant_id" {}
+            
+    3. Create a resource group. Resource group is a collection of resources. 
+    Interpolation syntax can be used to create names for resource groups based on 1 or more variables. 
+    Its a good practice to keep separate resource group for each environment such as dev, test, perf, prod etc. 
+    
+            resource "azurerm_resource_group" "rg" {
+              location = var.location
+              name = "${var.org_name}-${var.env}-rg"
+            }
 
-6. explain ssh keys
+6. Apply terraform configuration
+
+    1. Run `terraform validate` command to validate the syntax in all tf in current directory. Sytax errors are highlighted in the output. 
+    2. Run `terraform plan`  command to generate a plan of action. This shows the resources to be added, changed and destroyed.
+    3. Once the plan is generated and looks good, run `terraform apply` and pass the variable values when asked.
+    
+7. explain ssh keys
