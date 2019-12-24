@@ -1,10 +1,4 @@
-# terraform-azure-setup
-1. Download and install terraform of not already present -  https://www.terraform.io/downloads.html
-2. Clone this git repository
-3. Run `terraform plan`, pass the variable values when asked
-4. If plan looks good, run `terraform apply`
-
-## Detailed instructions:
+# Azure Terraform detailed instructions:
 
 1. Terraform needs a Service Principal (client_id and client_secret) which is authorized to create resources in Azure subscription
     
